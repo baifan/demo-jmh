@@ -1,48 +1,18 @@
 package tech.weiyi.demo.metric;
 
-import java.util.concurrent.atomic.LongAdder;
+import java.util.Map;
 
-public class Histogram {
+public interface Histogram {
 
-    private final LongAdder[] durationDistribution;
+    void addElapse(int elapse);
 
-    private final LongAdder durationSum;
+    long getTotalCall();
 
-    private final LongAdder countSum;
+    long getTotalElapse();
 
-    /**
-     * 公共构造函数
-     */
-    public Histogram() {
-        super();
-        durationDistribution = new LongAdder[HistrogramStep.ARRY_LENGTH];
-        for (int i = 0; i < HistrogramStep.ARRY_LENGTH; i++) {
-            durationDistribution[i] = new LongAdder();
-        }
-        durationSum = new LongAdder();
-        countSum = new LongAdder();
-    }
+    Map<Integer, Long> getElapseScatter();
 
-    public void addDuration(long duration) {
-        countSum.increment();
-        durationSum.add(duration);
-        durationDistribution[HistrogramStep.getIndex(duration)].increment();
-    }
+    void setDistributor(Distribution distribution);
 
-    public long getCountSum() {
-        return countSum.sum();
-    }
-
-    public long getDurationSum() {
-        return durationSum.sum();
-    }
-
-    public long[] getDurationDistribution() {
-        long[] result = new long[durationDistribution.length];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = durationDistribution[i].sum();
-        }
-        return result;
-    }
-
+    void reset();
 }
