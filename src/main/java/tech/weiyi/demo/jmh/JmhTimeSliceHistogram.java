@@ -13,7 +13,7 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
-import tech.weiyi.demo.metric.TimeSlideHistogram;
+import tech.weiyi.demo.metric.TimeSliceHistogram;
 
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
@@ -22,9 +22,9 @@ import java.util.concurrent.TimeUnit;
 @OutputTimeUnit(TimeUnit.SECONDS)
 @Fork(5)
 @Threads(50)
-public class JmhTimeSlideHistogram {
+public class JmhTimeSliceHistogram {
 
-    private TimeSlideHistogram histogram = new TimeSlideHistogram(16, 1000);
+    private TimeSliceHistogram histogram = new TimeSliceHistogram(16, 1000);
 
     @Benchmark
     @Warmup(iterations = 5, time = 100, timeUnit = TimeUnit.MILLISECONDS)
@@ -35,7 +35,7 @@ public class JmhTimeSlideHistogram {
 
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
-                .include(JmhTimeSlideHistogram.class.getSimpleName())
+                .include(JmhTimeSliceHistogram.class.getSimpleName())
                 .measurementTime(TimeValue.seconds(1))
                 .build();
         new Runner(opt).run();

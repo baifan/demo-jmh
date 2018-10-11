@@ -2,32 +2,32 @@ package tech.weiyi.demo.metric;
 
 import java.util.concurrent.atomic.AtomicStampedReference;
 
-public class TimeSlideHistogram {
+public class TimeSliceHistogram {
 
     private AtomicStampedReference<Histogram>[] histograms;
 
     private final long TIME_20181010 = 1539100800000L;
 
-    private final int timeDivision;
+    private final int timeDivisionMs;
 
-    private final int slide;
+    private final int slice;
 
-    public TimeSlideHistogram(int slide, int timeDivision) {
+    public TimeSliceHistogram(int slice, int timeDivisionMs) {
         super();
-        if ((slide & slide - 1) != 0) {
-            throw new IllegalArgumentException("Slide should be 2's power : " + slide);
+        if ((slice & slice - 1) != 0) {
+            throw new IllegalArgumentException("Slice should be 2's power : " + slice);
         }
-        this.slide = slide;
-        this.timeDivision = timeDivision;
-        histograms = new AtomicStampedReference[slide];
-        for (int i = 0; i < slide; i++) {
+        this.slice = slice;
+        this.timeDivisionMs = timeDivisionMs;
+        histograms = new AtomicStampedReference[slice];
+        for (int i = 0; i < slice; i++) {
             histograms[i] = new AtomicStampedReference<>(new CommonHistogram(), getStamp(System.currentTimeMillis()));
         }
     }
 
     public void addElapse(int duration) {
-        int newStamp = (int) ((System.currentTimeMillis() - TIME_20181010) / timeDivision);
-        int index = newStamp % slide;
+        int newStamp = (int) ((System.currentTimeMillis() - TIME_20181010) / timeDivisionMs);
+        int index = newStamp % slice;
         AtomicStampedReference<Histogram> reference = histograms[index];
         Histogram histogram = reference.getReference();
         while (reference.getStamp() != newStamp) {
@@ -43,7 +43,7 @@ public class TimeSlideHistogram {
      */
     public HistogramSnap getHistogram(long timestamp) {
         int stamp = getStamp(timestamp);
-        int index = stamp % slide;
+        int index = stamp % slice;
         AtomicStampedReference<Histogram> reference = histograms[index];
 
         if (reference.getStamp() != stamp) {
@@ -54,11 +54,11 @@ public class TimeSlideHistogram {
     }
 
     private long getDivisionStamp(long timestamp) {
-        return (timestamp / timeDivision) * timeDivision;
+        return (timestamp / timeDivisionMs) * timeDivisionMs;
     }
 
     private int getStamp(long timestamp) {
-        return (int) ((timestamp - TIME_20181010) / timeDivision);
+        return (int) ((timestamp - TIME_20181010) / timeDivisionMs);
     }
 
 }
