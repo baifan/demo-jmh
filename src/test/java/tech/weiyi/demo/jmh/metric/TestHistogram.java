@@ -1,7 +1,7 @@
 package tech.weiyi.demo.jmh.metric;
 
 import com.alibaba.fastjson.JSONObject;
-import tech.weiyi.demo.metric.CommonHistogram;
+import tech.weiyi.demo.metric.Histogram;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -12,16 +12,16 @@ public class TestHistogram {
 
     public static final int THREAD_SIZE = 100;
 
-    public static final int MAX_DURATION = 66666;
+    public static final int MAX_ELAPSE = 66666;
 
     public static void main(String[] args) throws InterruptedException {
-        CommonHistogram histogram = new CommonHistogram();
+        Histogram histogram = new Histogram();
         ExecutorService executor = Executors.newFixedThreadPool(THREAD_SIZE);
         CountDownLatch latch = new CountDownLatch(THREAD_SIZE);
         for (int i = 0; i < THREAD_SIZE; i++) {
             executor.submit(() -> {
                 for (int j = 0; j < 100000; j++) {
-                    histogram.addElapse(ThreadLocalRandom.current().nextInt(MAX_DURATION));
+                    histogram.addElapse(ThreadLocalRandom.current().nextInt(MAX_ELAPSE));
                 }
                 latch.countDown();
             });

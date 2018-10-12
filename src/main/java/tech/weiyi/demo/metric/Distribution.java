@@ -8,8 +8,6 @@ public interface Distribution {
 
     Map<Integer, Long> getElapseScatter();
 
-    void addElapse(int duration);
-
-    void reset();
+    void addElapse(int elapse);
 
 }

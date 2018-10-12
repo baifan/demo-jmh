@@ -14,27 +14,33 @@ public class TimeSliceHistogram {
 
     public TimeSliceHistogram(int slice, int timeDivisionMs) {
         super();
-        if ((slice & slice - 1) != 0) {
-            throw new IllegalArgumentException("Slice should be 2's power : " + slice);
-        }
         this.slice = slice;
         this.timeDivisionMs = timeDivisionMs;
         histograms = new AtomicStampedReference[slice];
         for (int i = 0; i < slice; i++) {
-            histograms[i] = new AtomicStampedReference<>(new CommonHistogram(), getStamp(System.currentTimeMillis()));
+            histograms[i] = new AtomicStampedReference<>(getHistogram(), getStamp(System.currentTimeMillis()));
         }
     }
 
-    public void addElapse(int duration) {
+    protected Histogram getHistogram() {
+        return new Histogram();
+    }
+
+    public long addElapse(int elapse) {
         int newStamp = (int) ((System.currentTimeMillis() - TIME_20181010) / timeDivisionMs);
         int index = newStamp % slice;
         AtomicStampedReference<Histogram> reference = histograms[index];
         Histogram histogram = reference.getReference();
-        while (reference.getStamp() != newStamp) {
-            histogram.reset();
-            reference.attemptStamp(histogram, newStamp);
+        int oldStamp = reference.getStamp();
+        if (oldStamp != newStamp) {
+            Histogram newHistogram = getHistogram();
+            if (reference.compareAndSet(histogram, newHistogram, oldStamp, newStamp)) {
+                histogram = newHistogram;
+            } else {
+                histogram = reference.getReference();
+            }
         }
-        histogram.addElapse(duration);
+        return histogram.addElapse(elapse);
     }
 
     /**
@@ -50,7 +56,9 @@ public class TimeSliceHistogram {
             return null;
         }
         Histogram histogram = reference.getReference();
-        return new HistogramSnap(getDivisionStamp(timestamp), histogram.getTotalElapse(), histogram.getTotalCall(), histogram.getElapseScatter());
+        long beginTimestamp = getDivisionStamp(timestamp);
+        long endTimestamp = beginTimestamp + timeDivisionMs - 1;
+        return new HistogramSnap(beginTimestamp, endTimestamp, histogram.getTotalElapse(), histogram.getTotalCall(), histogram.getElapseScatter());
     }
 
     private long getDivisionStamp(long timestamp) {

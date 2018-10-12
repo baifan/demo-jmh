@@ -61,22 +61,19 @@ public class PowerDistribution implements Distribution {
         if (value != 0) {
             scatter.put(0, value);
         }
+        long sumCount;
         for (int i = 1; i <= MAX_INDEX; i++) {
-            scatter.put(1 << (i - 1), elapseScatter[i].sum());
+            sumCount = elapseScatter[i].sum();
+            if (sumCount != 0) {
+                scatter.put(1 << (i - 1), sumCount);
+            }
         }
         return scatter;
     }
 
     @Override
-    public void addElapse(int duration) {
-        elapseScatter[this.getIndex(duration)].increment();
-    }
-
-    @Override
-    public void reset() {
-        for (LongAdder londAdder : elapseScatter) {
-            londAdder.reset();
-        }
+    public void addElapse(int elapse) {
+        elapseScatter[this.getIndex(elapse)].increment();
     }
 
 }

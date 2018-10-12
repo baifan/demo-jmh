@@ -12,8 +12,7 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
-import tech.weiyi.demo.metric.CommonHistogram;
-import tech.weiyi.demo.metric.MapDistribution;
+import tech.weiyi.demo.metric.Histogram;
 
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
@@ -21,10 +20,10 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Benchmark)
 @OutputTimeUnit(TimeUnit.SECONDS)
 @Fork(5)
-@Threads(50)
-public class JmhMapHistogram {
+@Threads(100)
+public class Jmh01Histogram {
 
-    private CommonHistogram histogram = new CommonHistogram(new MapDistribution());
+    private Histogram histogram = new Histogram();
 
     @Benchmark
     @Warmup(iterations = 5, time = 100, timeUnit = TimeUnit.MILLISECONDS)
@@ -35,7 +34,7 @@ public class JmhMapHistogram {
 
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
-                .include(JmhMapHistogram.class.getSimpleName())
+                .include(Jmh01Histogram.class.getSimpleName())
                 .build();
         new Runner(opt).run();
     }

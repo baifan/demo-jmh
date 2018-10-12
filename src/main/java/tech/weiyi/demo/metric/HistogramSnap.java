@@ -4,13 +4,15 @@ import java.util.Map;
 
 public class HistogramSnap {
 
-    private long timestamp;
+    private long begStamp;
+
+    private long endStamp;
 
     private long totalElapse;
 
     private long totalCall;
 
-    private Map<Integer, Long> elapseScatter;
+    private Map<Integer, Long> scatter;
 
     /**
      * 公共构造函数
@@ -19,19 +21,28 @@ public class HistogramSnap {
         super();
     }
 
-    public HistogramSnap(long timestamp, long totalElapse, long totalCall, Map<Integer, Long> elapseScatter) {
-        this.timestamp = timestamp;
+    public HistogramSnap(long begStamp, long endStamp, long totalElapse, long totalCall, Map<Integer, Long> scatter) {
+        this.begStamp = begStamp;
+        this.endStamp = endStamp;
         this.totalElapse = totalElapse;
         this.totalCall = totalCall;
-        this.elapseScatter = elapseScatter;
+        this.scatter = scatter;
     }
 
-    public long getTimestamp() {
-        return timestamp;
+    public long getBegStamp() {
+        return begStamp;
     }
 
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
+    public void setBegStamp(long begStamp) {
+        this.begStamp = begStamp;
+    }
+
+    public long getEndStamp() {
+        return endStamp;
+    }
+
+    public void setEndStamp(long endStamp) {
+        this.endStamp = endStamp;
     }
 
     public long getTotalElapse() {
@@ -50,11 +61,11 @@ public class HistogramSnap {
         this.totalCall = totalCall;
     }
 
-    public Map<Integer, Long> getElapseScatter() {
-        return elapseScatter;
+    public Map<Integer, Long> getScatter() {
+        return scatter;
     }
 
-    public void setElapseScatter(Map<Integer, Long> elapseScatter) {
-        this.elapseScatter = elapseScatter;
+    public void setScatter(Map<Integer, Long> scatter) {
+        this.scatter = scatter;
     }
 }

@@ -15,7 +15,7 @@ public class MapDistribution implements Distribution {
      */
     public MapDistribution() {
         super();
-        elapseScatter = new ConcurrentHashMap<>();
+        elapseScatter = new ConcurrentHashMap<>(256);
     }
 
     public int getIndex(int value) {
@@ -32,22 +32,15 @@ public class MapDistribution implements Distribution {
     }
 
     @Override
-    public void addElapse(int duration) {
-        LongAdder longAdder = elapseScatter.get(duration);
+    public void addElapse(int elapse) {
+        LongAdder longAdder = elapseScatter.get(elapse);
         if (longAdder == null) {
             longAdder = new LongAdder();
-            LongAdder existAdder = elapseScatter.putIfAbsent(duration, longAdder);
+            LongAdder existAdder = elapseScatter.putIfAbsent(elapse, longAdder);
             if (existAdder != null) {
                 longAdder = existAdder;
             }
         }
         longAdder.increment();
-
     }
-
-    @Override
-    public void reset() {
-        elapseScatter.clear();
-    }
-
 }
