@@ -1,12 +1,11 @@
 package tech.weiyi.demo.jmh.metric;
 
 import com.alibaba.fastjson.JSONObject;
-import tech.weiyi.demo.metric.Histogram;
+import tech.weiyi.demo.metric.HistogramImpl;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class TestHistogram {
 
@@ -15,20 +14,24 @@ public class TestHistogram {
     public static final int MAX_ELAPSE = 66666;
 
     public static void main(String[] args) throws InterruptedException {
-        Histogram histogram = new Histogram();
+        HistogramImpl histogram = new HistogramImpl();
         ExecutorService executor = Executors.newFixedThreadPool(THREAD_SIZE);
         CountDownLatch latch = new CountDownLatch(THREAD_SIZE);
         for (int i = 0; i < THREAD_SIZE; i++) {
             executor.submit(() -> {
-                for (int j = 0; j < 100000; j++) {
-                    histogram.addElapse(ThreadLocalRandom.current().nextInt(MAX_ELAPSE));
+                for (int j = 0; j < 65536; j++) {
+                    histogram.addElapse(j, true);
+                }
+                for (int j = 0; j < 1; j++) {
+                    histogram.addElapse(1, false);
                 }
                 latch.countDown();
             });
         }
         latch.await();
         System.out.println(histogram.getTotalCall());
-        System.out.println(histogram.getTotalElapse());
-        System.out.println(JSONObject.toJSONString(histogram.getElapseScatter()));
+        System.out.println(histogram.getTotalElapseSuccess());
+        System.out.println(JSONObject.toJSONString(histogram.getElapseScatterSuccess()));
+        System.out.println(JSONObject.toJSONString(histogram.getTotalCallFailed()));
     }
 }

@@ -1,10 +1,8 @@
 package tech.weiyi.demo.metric;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.atomic.LongAdder;
 
-public class PowerDistribution implements Distribution {
+public class PowerScatter implements Scatter {
 
     public static final int STEP_ONE = 1 << 1;
 
@@ -21,7 +19,7 @@ public class PowerDistribution implements Distribution {
     /**
      * 公共构造函数
      */
-    public PowerDistribution() {
+    public PowerScatter() {
         super();
         elapseScatter = new LongAdder[MAX_INDEX + 1];
         for (int i = 0; i <= MAX_INDEX; i++) {
@@ -55,20 +53,12 @@ public class PowerDistribution implements Distribution {
     }
 
     @Override
-    public Map<Integer, Long> getElapseScatter() {
-        Map<Integer, Long> scatter = new HashMap<>();
-        long value = elapseScatter[0].sum();
-        if (value != 0) {
-            scatter.put(0, value);
+    public long[] getElapseScatter() {
+        long[] result = new long[MAX_INDEX + 1];
+        for (int i = 0; i <= MAX_INDEX; i++) {
+            result[i] = elapseScatter[i].sum();
         }
-        long sumCount;
-        for (int i = 1; i <= MAX_INDEX; i++) {
-            sumCount = elapseScatter[i].sum();
-            if (sumCount != 0) {
-                scatter.put(1 << (i - 1), sumCount);
-            }
-        }
-        return scatter;
+        return result;
     }
 
     @Override

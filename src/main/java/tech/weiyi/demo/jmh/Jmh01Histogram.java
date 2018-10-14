@@ -12,7 +12,7 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
-import tech.weiyi.demo.metric.Histogram;
+import tech.weiyi.demo.metric.HistogramImpl;
 
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
@@ -23,13 +23,13 @@ import java.util.concurrent.TimeUnit;
 @Threads(100)
 public class Jmh01Histogram {
 
-    private Histogram histogram = new Histogram();
+    private HistogramImpl histogram = new HistogramImpl();
 
     @Benchmark
     @Warmup(iterations = 5, time = 100, timeUnit = TimeUnit.MILLISECONDS)
     @Measurement(iterations = 5, time = 100, timeUnit = TimeUnit.MILLISECONDS)
     public void measure() {
-        histogram.addElapse(ThreadLocalRandom.current().nextInt(66666));
+        histogram.addElapse(ThreadLocalRandom.current().nextInt(66666), true);
     }
 
     public static void main(String[] args) throws RunnerException {

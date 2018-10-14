@@ -2,8 +2,7 @@ package tech.weiyi.demo.jmh.metric;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import tech.weiyi.demo.metric.MethodCall;
-import tech.weiyi.demo.metric.TimeSliceHistogramMap;
+import tech.weiyi.demo.metric.TimeSliceHistogramCalculator;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -14,14 +13,17 @@ public class TestHistogramMemoryUsage {
 
 
     public static void main(String[] args) throws InterruptedException {
-        ExecutorService service = Executors.newFixedThreadPool(50);
-        TimeSliceHistogramMap histogram = new TimeSliceHistogramMap(16, 60000);
+        final int timeDivisionMs = 60000;
+        final int threadSize = 50;
+        final int eachThreadLoopSize = 800;
+        ExecutorService service = Executors.newFixedThreadPool(threadSize);
+        TimeSliceHistogramCalculator histogram = new TimeSliceHistogramCalculator(timeDivisionMs, 2);
         AtomicBoolean ab = new AtomicBoolean(true);
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < threadSize; i++) {
             service.submit(() -> {
                 while (ab.get()) {
-                    for (int j = 0; j < 700; j++) {
-                        histogram.addElapse(new MethodCall(j, Long.toString(j)), ThreadLocalRandom.current().nextInt(65535));
+                    for (int j = 0; j < eachThreadLoopSize; j++) {
+                        histogram.addElapse(Long.toString(j), ThreadLocalRandom.current().nextInt(65535), true);
                     }
                     try {
                         Thread.sleep(10);
@@ -35,9 +37,9 @@ public class TestHistogramMemoryUsage {
         Thread printMetric = new Thread(() -> {
             do {
                 try {
-                    Thread.sleep(60000);
+                    Thread.sleep(timeDivisionMs);
                     System.out.println("===============================================");
-                    System.out.println(JSONObject.toJSONString(histogram.getMethodHistogram(System.currentTimeMillis() - 60000), SerializerFeature.WriteNonStringKeyAsString, SerializerFeature.PrettyFormat));
+                    System.out.println(JSONObject.toJSONString(histogram.getHistogramQueue().poll(), SerializerFeature.WriteNonStringKeyAsString, SerializerFeature.PrettyFormat));
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -45,7 +47,7 @@ public class TestHistogramMemoryUsage {
         });
         printMetric.start();
 
-        Thread.sleep(100000000);
+        Thread.sleep(timeDivisionMs * 100);
         ab.set(false);
         service.shutdown();
 

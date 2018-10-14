@@ -14,8 +14,7 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
-import tech.weiyi.demo.metric.MethodCall;
-import tech.weiyi.demo.metric.TimeSliceHistogramMap;
+import tech.weiyi.demo.metric.TimeSliceHistogramCalculator;
 
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
@@ -24,21 +23,20 @@ import java.util.concurrent.atomic.AtomicLong;
 @State(Scope.Benchmark)
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
 @Fork(5)
-@Threads(300)
+@Threads(50)
 public class Jmh04TimeSliceHistogramMap {
 
-    private TimeSliceHistogramMap histogram = new TimeSliceHistogramMap(16, 1000);
+    private TimeSliceHistogramCalculator histogram = new TimeSliceHistogramCalculator(2000, 2);
 
     private AtomicLong id = new AtomicLong();
 
     @Benchmark
-    @BenchmarkMode({Mode.AverageTime})
-    @Warmup(iterations = 5, time = 100, timeUnit = TimeUnit.MILLISECONDS)
-    @Measurement(iterations = 16, time = 1000, timeUnit = TimeUnit.MILLISECONDS)
+    @BenchmarkMode({Mode.AverageTime, Mode.Throughput})
+    @Warmup(iterations = 5, time = 1000, timeUnit = TimeUnit.MILLISECONDS)
+    @Measurement(iterations = 16, time = 500, timeUnit = TimeUnit.MILLISECONDS)
     public void measure() {
         int index = (int) (id.incrementAndGet() % 500);
-        MethodCall methodCall = new MethodCall(index, String.valueOf(index));
-        histogram.addElapse(methodCall, ThreadLocalRandom.current().nextInt(500));
+        histogram.addElapse(Integer.toString(index), ThreadLocalRandom.current().nextInt(500), false);
     }
 
     public static void main(String[] args) throws RunnerException {

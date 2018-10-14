@@ -1,12 +1,10 @@
 package tech.weiyi.demo.metric;
 
-import java.util.Map;
-
-public interface Distribution {
+public interface Scatter {
 
     int getIndex(int value);
 
-    Map<Integer, Long> getElapseScatter();
+    long[] getElapseScatter();
 
     void addElapse(int elapse);
 

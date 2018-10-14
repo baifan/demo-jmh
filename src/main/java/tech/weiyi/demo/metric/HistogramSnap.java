@@ -1,18 +1,14 @@
 package tech.weiyi.demo.metric;
 
-import java.util.Map;
-
-public class HistogramSnap {
-
-    private long begStamp;
-
-    private long endStamp;
-
-    private long totalElapse;
+public class HistogramSnap implements Histogram {
 
     private long totalCall;
 
-    private Map<Integer, Long> scatter;
+    private long totalCallFailed;
+
+    private long totalElapseSuccess;
+
+    private long[] elapseScatterSuccess;
 
     /**
      * 公共构造函数
@@ -21,38 +17,12 @@ public class HistogramSnap {
         super();
     }
 
-    public HistogramSnap(long begStamp, long endStamp, long totalElapse, long totalCall, Map<Integer, Long> scatter) {
-        this.begStamp = begStamp;
-        this.endStamp = endStamp;
-        this.totalElapse = totalElapse;
-        this.totalCall = totalCall;
-        this.scatter = scatter;
+    @Override
+    public long addElapse(int elapse, boolean isSuccess) {
+        return 0;
     }
 
-    public long getBegStamp() {
-        return begStamp;
-    }
-
-    public void setBegStamp(long begStamp) {
-        this.begStamp = begStamp;
-    }
-
-    public long getEndStamp() {
-        return endStamp;
-    }
-
-    public void setEndStamp(long endStamp) {
-        this.endStamp = endStamp;
-    }
-
-    public long getTotalElapse() {
-        return totalElapse;
-    }
-
-    public void setTotalElapse(long totalElapse) {
-        this.totalElapse = totalElapse;
-    }
-
+    @Override
     public long getTotalCall() {
         return totalCall;
     }
@@ -61,11 +31,30 @@ public class HistogramSnap {
         this.totalCall = totalCall;
     }
 
-    public Map<Integer, Long> getScatter() {
-        return scatter;
+    @Override
+    public long getTotalCallFailed() {
+        return totalCallFailed;
     }
 
-    public void setScatter(Map<Integer, Long> scatter) {
-        this.scatter = scatter;
+    public void setTotalCallFailed(long totalCallFailed) {
+        this.totalCallFailed = totalCallFailed;
+    }
+
+    @Override
+    public long getTotalElapseSuccess() {
+        return totalElapseSuccess;
+    }
+
+    public void setTotalElapseSuccess(long totalElapseSuccess) {
+        this.totalElapseSuccess = totalElapseSuccess;
+    }
+
+    @Override
+    public long[] getElapseScatterSuccess() {
+        return elapseScatterSuccess;
+    }
+
+    public void setElapseScatterSuccess(long[] elapseScatterSuccess) {
+        this.elapseScatterSuccess = elapseScatterSuccess;
     }
 }
